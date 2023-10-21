@@ -19,6 +19,7 @@ for i in range(len(ghdbiomed)):
     for j in ghdbiomed[i]:
         tokens.append(j)
     tokenslist.append(tokens)
+tokenslist.pop(-1)
 
 data = json.load(open('data.json','r'))
 json.dump(data,open('data.json_bak','w'))

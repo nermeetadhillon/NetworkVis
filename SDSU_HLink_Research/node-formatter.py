@@ -48,7 +48,7 @@ keys = list(idscolors.keys())
 
 for c,dictionary in enumerate(data['edges']):
     for i in range(len(keys)):
-        if dictionary['id'] in keys[i]:
+        if dictionary['source'] in keys[i]:
             color_change = idscolors.get(keys[i])
             #print(color_change)
             data['edges'][c].update(color_change)

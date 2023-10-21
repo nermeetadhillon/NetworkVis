@@ -35,7 +35,7 @@ for c,dictionary in enumerate(data['nodes']):
             data['nodes'][c].update(size_)
             data['nodes'][c].update(color_change)
             #print(color_change)
-        elif 'Biomedical Technology Research Cluster ' + str(i+1)  in dictionary['label']:
+        elif 'Research Cluster ' + str(i+1)  in dictionary['label']:
             colorstr = str(colors[i])
             color_change = { 'color' : 'rgb'+colorstr }
             size_ = {'size': 3.0 }

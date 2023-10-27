@@ -19,7 +19,6 @@ for i in range(len(ghdbiomed)):
     for j in ghdbiomed[i]:
         tokens.append(j)
     tokenslist.append(tokens)
-tokenslist.pop(-1)
 
 data = json.load(open('data.json','r'))
 json.dump(data,open('data.json_bak','w'))
@@ -36,7 +35,7 @@ for c,dictionary in enumerate(data['nodes']):
             data['nodes'][c].update(size_)
             data['nodes'][c].update(color_change)
             #print(color_change)
-        elif 'Research Cluster ' + str(i+1)  in dictionary['label']:
+        elif 'Global Health Disparities Research Cluster ' + str(i+1)  in dictionary['label']:
             colorstr = str(colors[i])
             color_change = { 'color' : 'rgb'+colorstr }
             size_ = {'size': 3.0 }

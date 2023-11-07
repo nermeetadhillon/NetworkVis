@@ -1,57 +1,49 @@
 import json
-import pickle5 as pickle
-from collections import Counter
-import math
-import pandas as pd
-import numpy as np
+import pickle
 import random
 
+# Load the list of lists containing labels.
+ghdbiomed = pickle.load(open('all_sublists.pkl', 'rb'))
 
-ghdbiomed= pickle.load(open('all_sublists.pkl','rb'))
-#colors = [(128,0,0),(165,42,42),(255,0,0),(255,215,0),(238,232,170),(255,255,0),(154,205,50),(127,255,0),(0,128,0),(143,188,143),(102,205,170),(47,79,79),(0,128,128),(0,255,255),(224,255,255),(64,224,208),(127,255,212),(70,130,180),(100,149,237),(0,191,255),(30,144,255),(135,206,250),(0,0,128),(0,0,255),(138,43,226),(75,0,130),(123,104,238),(139,0,139),(148,0,211),(186,85,211),(221,160,221),(238,130,238),(255,0,255),(199,21,133),(255,20,147),(255,192,203),(255,228,196),(139,69,19),(244,164,96),(188,143,143),(255,240,245),(245,255,250),(112,128,144),(240,255,240)]
-colors = pickle.load(open('RGBColors.pickle','rb'))
-
+# Load the colors and shuffle them.
+colors = pickle.load(open('RGBColors.pickle', 'rb'))
 random.shuffle(colors)
 
-tokenslist = []
-for i in range(len(ghdbiomed)):
-    tokens = []
-    for j in ghdbiomed[i]:
-        tokens.append(j)
-    tokenslist.append(tokens)
-tokenslist.pop(-1)
+# Load the JSON data.
+data = json.load(open('data.json', 'r'))
 
-data = json.load(open('data.json','r'))
-json.dump(data,open('data.json_bak','w'))
+# Backup the original data.
+json.dump(data, open('data.json_bak', 'w'))
 
+# Dictionary for keeping track of colors assigned to each id.
 idscolors = {} 
-for c,dictionary in enumerate(data['nodes']):
-    for i in range(len(tokenslist)):
-        if dictionary['label'] in tokenslist[i]:
-            idf = dictionary['id']
-            colorstr = str(colors[i])
-            color_change = { 'color' : 'rgb'+colorstr }
-            size_ = {'size': 1.0 }
-            idscolors[idf] = color_change
-            data['nodes'][c].update(size_)
+
+# Update nodes with colors based on the sublist they belong to.
+for c, node in enumerate(data['nodes']):
+    for sublist_index, sublist in enumerate(ghdbiomed):
+        if node['label'] in sublist:
+            # Update the node color and size.
+            colorstr = str(colors[sublist_index])
+            color_change = {'color': 'rgb' + colorstr}
+            size_change = {'size': 1.0}
+            idscolors[node['id']] = color_change
+            data['nodes'][c].update(size_change)
             data['nodes'][c].update(color_change)
-            #print(color_change)
-        elif dictionary['label'] == 'Global Health Disparities Research Cluster ' + str(i+1):
-            colorstr = str(colors[i])
-            color_change = { 'color' : 'rgb'+colorstr }
-            size_ = {'size': 3.0 }
-            data['nodes'][c].update(size_)
-            data['nodes'][c].update(color_change)
+        elif 'Global Health Disparities Research Cluster' in node['label']:
+            # Update the cluster node if the index matches.
+            cluster_number = int(node['label'].split()[-1])
+            if cluster_number - 1 < len(ghdbiomed):
+                colorstr = str(colors[cluster_number - 1])
+                color_change = {'color': 'rgb' + colorstr}
+                size_change = {'size': 3.0}
+                idscolors[node['id']] = color_change
+                data['nodes'][c].update(size_change)
+                data['nodes'][c].update(color_change)
 
+# Update edges with the color of their source node.
+for edge in data['edges']:
+    if edge['source'] in idscolors:
+        edge.update(idscolors[edge['source']])
 
-keys = list(idscolors.keys())
-
-for c,dictionary in enumerate(data['edges']):
-    for i in range(len(keys)):
-        if dictionary['source'] in keys[i]:
-            color_change = idscolors.get(keys[i])
-            #print(color_change)
-            data['edges'][c].update(color_change)
-
-
-json.dump(data,open('data.json','w'))
+# Save the updated JSON data.
+json.dump(data, open('data.json', 'w'))

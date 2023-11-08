@@ -29,7 +29,7 @@ for c, node in enumerate(data['nodes']):
             idscolors[node['id']] = color_change
             data['nodes'][c].update(size_change)
             data['nodes'][c].update(color_change)
-        elif 'Global Health Disparities Research Cluster' in node['label']:
+        elif 'Global Health Disparities Research Cluster ' in node['label']:
             # Update the cluster node if the index matches.
             cluster_number = int(node['label'].split()[-1])
             if cluster_number - 1 < len(ghdbiomed):
